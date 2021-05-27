@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+    auth_server:
+        build:
+            context: ./microservices/auth_server/
+        command: sh -c "export FLASK_APP=server.py && export FLASK_ENV=development && flask run --host=0.0.0.0"
+        ports:
+        - "5000:5000"
+        container_name: auth_server
+        env_file: 
+            - ./microservices/auth_server/.env
+        volumes:
+        - ./microservices/auth_server/:/code/micro/auth/   
+        # depends_on: 
+        #     - nextjs-ui      
+    nextjs-ui:
+        build:
+            context: ./client
+        command: npm run dev
+        ports:
+        - "3000:3000"
+        container_name: nextjs-ui
+        volumes:
+        - ./client:/code/client
+        - /code/client/node_modules
