@@ -186,8 +186,10 @@ def private_scoped():
 def userinfo():
     pass
 
-@APP.route("/callback",methods=['POST'])
+@APP.route("/callback",methods=['POST','OPTIONS'])
 def gettokens():
+    if request.method == 'OPTIONS':
+        print("ivde ethi",file=sys.stdout)    
     auth_code = json.loads(request.data)
     print(auth_code,file=sys.stdout)
     payload={

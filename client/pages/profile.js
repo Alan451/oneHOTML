@@ -1,19 +1,14 @@
-import fetch from 'isomorphic-unfetch'
+import Cookies from 'cookies'
 const baseurl= 'http://auth_server:5000'
+import Cookies from 'cookies'
 
-function Profile(props) {
-  console.log(props)
-  if(!props.data)return <div>Not Authenticated</div>
+
+function Profile({req,res}) {  
+  const cookies = new Cookies(req,res)
+  const accessToken = cookies.get('accessToken')
   return <div>
-      <h1>{props.data}</h1>
+      <h1>{accessToken}</h1>
     </div>
 }
 
-Profile.getInitialProps = async function(){
-  const res = await fetch(new URL('api/userinfo',baseurl))
-  const data = await res.json();
-  return{
-    data
-  }
-}
 export default Profile;

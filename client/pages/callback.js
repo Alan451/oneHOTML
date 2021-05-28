@@ -1,25 +1,33 @@
-import { useRouter } from 'next/router'
-import fetch from 'isomorphic-unfetch'
-import axios from 'axios'
 import Cookies from 'cookies'
+import axios from 'axios'
+import React,{ useState ,useEffect}  from 'react'
 
 
-
-async function callbackHandler() {
-  const router = useRouter()
-  const {code,state} = router.query
-  try{
-    const res = await axios.post('http://localhost:5000/callback',{code:code,state:state})
-    const {access_token,status_code} = JSON.parse(res)
-    if(status_code==401)return <div>Error in authentication</div>
-    console.log(access_token)
-    return <div>{access_token}</div>
-  }
-  catch(error){
-    return <div>{error}</div>
-  }
-  
+function callbackHandler({accessToken,statusCode}) {
+  if(statusCode==401)return <div>please try again...</div>
+  // res.redirect('/profile')
+  return <div>{accessToken}</div>
 }
-
+export async function getServerSideProps(context) {
+  const cookies = new Cookies(context.req,context.res)
+  const res = await axios.post('http://auth_server:5000/callback',
+    {
+      code:context.query.code,
+      state:context.query.state,
+    }
+  )
+  const data = res.data
+  
+  if(data.status_code==401)return{
+    props: {'accessToken':"", 'statusCode':data.status_code}
+  }
+  cookies.set('accessToken', data.access_token, {
+    httpOnly: true,
+    sameSite: 'lax'
+  })  
+  return {
+    props: {'accessToken':data.access_token, 'statusCode':data.status_code} // will be passed to the page component as props
+  }
+}
 
 export default callbackHandler;
