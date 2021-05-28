@@ -1,7 +1,5 @@
 import Cookies from 'cookies'
 import axios from 'axios'
-import React,{ useState ,useEffect}  from 'react'
-
 
 function callbackHandler({accessToken,statusCode}) {
   if(statusCode==401)return <div>please try again...</div>
@@ -18,10 +16,14 @@ export async function getServerSideProps(context) {
   )
   const data = res.data
   
-  if(data.status_code==401)return{
+  if(data.status_code==401)return {
     props: {'accessToken':"", 'statusCode':data.status_code}
   }
   cookies.set('accessToken', data.access_token, {
+    httpOnly: true,
+    sameSite: 'lax'
+  })
+  cookies.set('statusCode', data.status_code, {
     httpOnly: true,
     sameSite: 'lax'
   })  

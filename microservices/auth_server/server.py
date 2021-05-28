@@ -203,6 +203,7 @@ def gettokens():
     res = requests.post('https://dev-6qurau5u.us.auth0.com/oauth/token',json = payload)
     # return res.json()
     data = res.json()
+    print(data,file=sys.stdout)
     try:
         session['ACCESS_TOKEN']=data['access_token']
         # session['ID_TOKEN']=data['id_token']
@@ -211,48 +212,7 @@ def gettokens():
     except:
         status_code = 401
         return jsonify(status_code=status_code)
-        # raise AuthError({"code":"Invalid Auth Code","description":"Try logging in again. Auth Code expired"},401)
-      
-    # jsonurl = urlopen("https://dev-6qurau5u.us.auth0.com/.well-known/jwks.json")
-    # jwks = json.loads(jsonurl.read())
-    # unverified_header = jwt.get_unverified_header(session['ID_TOKEN'])
-    # rsa_key = {}
-    # for key in jwks["keys"]:
-    #     if key["kid"] == unverified_header["kid"]:
-    #         rsa_key = {
-    #             "kty": key["kty"],
-    #             "kid": key["kid"],
-    #             "use": key["use"],
-    #             "n": key["n"],
-    #             "e": key["e"]
-    #         }
-    # if rsa_key:
-    #     try:
-    #         payload = jwt.decode(
-    #             session['ID_TOKEN'],
-    #             rsa_key,
-    #             algorithms=ALGORITHMS,
-    #             audience='fWuWXEIJgxyVyzPtFtiunduz0ntw5QsZ',
-    #             issuer="https://dev-6qurau5u.us.auth0.com/"
-    #         )
-    #     except jwt.ExpiredSignatureError:
-    #         raise AuthError({"code": "token_expired",
-    #                         "description": "token is expired"}, 401)
-    #     except jwt.JWTClaimsError:
-    #         raise AuthError({"code": "invalid_claims",
-    #                         "description":
-    #                             "incorrect claims,"
-    #                             "please check the audience and issuer"}, 401)
-    #     except Exception:
-    #         raise AuthError({"code": "invalid_header",
-    #                         "description":
-    #                             "Unable to parse authentication"
-    #                             " token."}, 401)
-    #     _request_ctx_stack.top.current_user = payload
-        # session['USER_INFO'] = payload
-    # print(payload,file=sys.stdout)
-
-
+        
 if __name__ == "__main__":
     APP.run(host='0.0.0.0',port=5000, debug=True)
 
