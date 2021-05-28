@@ -17,7 +17,7 @@ export async function getServerSideProps(context) {
   const data = res.data
   
   if(data.status_code==401)return {
-    props: {'accessToken':"", 'statusCode':data.status_code}
+    props: {'accessToken':"", 'refreshToken':"",'statusCode':data.status_code}
   }
   cookies.set('accessToken', data.access_token, {
     httpOnly: true,
@@ -26,7 +26,8 @@ export async function getServerSideProps(context) {
   cookies.set('statusCode', data.status_code, {
     httpOnly: true,
     sameSite: 'lax'
-  })  
+  })
+    
   return {
     props: {'accessToken':data.access_token, 'statusCode':data.status_code} // will be passed to the page component as props
   }

@@ -12,7 +12,7 @@ export default function Home() {
 
       <main>
         <h1 className="title">
-          <a href="https://dev-6qurau5u.us.auth0.com/authorize?response_type=code&client_id=fWuWXEIJgxyVyzPtFtiunduz0ntw5QsZ&redirect_uri=http://localhost:3000/callback&scope=openid%20profile%20offline_access&state=xyzABC123">Login with Auth0</a>
+          <a href="https://dev-6qurau5u.us.auth0.com/authorize?response_type=code&client_id=fWuWXEIJgxyVyzPtFtiunduz0ntw5QsZ&redirect_uri=http://localhost:3000/callback&audience=http://localhost:5000/login&scope=openid%20profile%20offline_access&state=xyzABC123">Login with Auth0</a>
         </h1>
       </main>
 

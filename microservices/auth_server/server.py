@@ -17,6 +17,8 @@ if ENV_FILE:
     load_dotenv(ENV_FILE)
 AUTH0_DOMAIN = env.get("AUTH0_DOMAIN")
 API_IDENTIFIER = env.get("API_IDENTIFIER")
+CLIENT_SECRET = env.get("CLIENT_SECRET")
+CLIENT_ID = env.get("CLIENT_ID")
 ALGORITHMS = ["RS256"]
 APP = Flask(__name__)
 APP.config["SECRET_KEY"] = "OCML3BRawWEUeaxcuKHLpw"
@@ -152,61 +154,35 @@ def public():
     return jsonify(message=response)
 
 
-@APP.route("/api/private")
-@cross_origin(headers=["Content-Type", "Authorization"])
-@cross_origin(headers=["Access-Control-Allow-Origin", "http://nextjs-ui:3000"])
-@requires_auth
-def private():
-    """A valid access token is required to access this route
-    """
-    response = "Hello from a private endpoint! You need to be authenticated to see this."
-    return jsonify(message=response)
-
-
-@APP.route("/api/private-scoped")
-@cross_origin(headers=["Content-Type", "Authorization"])
-@cross_origin(headers=["Access-Control-Allow-Origin", "http://nextjs-ui:3000"])
-@requires_auth
-def private_scoped():
-    """A valid access token and an appropriate scope are required to access this route
-    """
-    if requires_scope("read:messages"):
-        response = "Hello from a private endpoint! You need to be authenticated and have a scope of read:messages to see this."
-        return jsonify(message=response)
-    raise AuthError({
-        "code": "Unauthorized",
-        "description": "You don't have access to this resource"
-    }, 403)
-
-
 @APP.route("/api/userinfo")
 @cross_origin(headers=["Content-Type", "Authorization"])
 @cross_origin(headers=["Access-Control-Allow-Origin", "http://nextjs-ui:3000"])
 @requires_auth
 def userinfo():
-    pass
+    token = get_token_auth_header()
+    res = requests.get("https://"+AUTH0_DOMAIN+"/userinfo",headers={
+        'Authorization': 'Bearer '+token,
+    })
+    data = res.json()
+    print(data,file=sys.stdout)
+    return jsonify(userData=data)
 
 @APP.route("/callback",methods=['POST','OPTIONS'])
 @cross_origin(headers=["Access-Control-Allow-Origin", "http://nextjs-ui:3000"])
 def gettokens():
-    if request.method == 'OPTIONS':
-        print("ivde ethi",file=sys.stdout)    
     auth_code = json.loads(request.data)
-    print(auth_code,file=sys.stdout)
     payload={
         'grant_type':'authorization_code',
-        'client_id':'fWuWXEIJgxyVyzPtFtiunduz0ntw5QsZ',
-        'client_secret':'ErX-lG3Lj2yYhWp0rXmwr738xej5MZEEQcShV5QgzDPwYMQQjHa6870V0s77H8kz',
+        'client_id':CLIENT_ID,
+        'client_secret': CLIENT_SECRET,
         'code':auth_code.get('code'),
+        'audience':API_IDENTIFIER,
         'redirect_uri':'http://localhost:3000/callback'
     }
-    res = requests.post('https://dev-6qurau5u.us.auth0.com/oauth/token',json = payload)
-    # return res.json()
+    res = requests.post("https://"+AUTH0_DOMAIN+"/oauth/token",json = payload)
     data = res.json()
-    print(data,file=sys.stdout)
     try:
         session['ACCESS_TOKEN']=data['access_token']
-        # session['ID_TOKEN']=data['id_token']
         status_code = 201
         return jsonify(access_token=data['access_token'],status_code=status_code)
     except:
