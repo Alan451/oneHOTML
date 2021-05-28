@@ -187,6 +187,7 @@ def userinfo():
     pass
 
 @APP.route("/callback",methods=['POST','OPTIONS'])
+@cross_origin(headers=["Access-Control-Allow-Origin", "http://nextjs-ui:3000"])
 def gettokens():
     if request.method == 'OPTIONS':
         print("ivde ethi",file=sys.stdout)    
